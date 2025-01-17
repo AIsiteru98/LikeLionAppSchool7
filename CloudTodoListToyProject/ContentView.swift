@@ -13,30 +13,31 @@ struct ContentView: View {
     @Query private var todos: [TODO]
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(todos) { todo in
-                    NavigationLink {
-                        Text("Item at \(todo.createDate, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(todo.createdDate, format: Date.FormatStyle(date: .numeric, time: .standard))
+        
+        NavigationStack {
+            VStack {
+                Text ("TODO LIST")
+                    .font(.title)
+                
+                HStack {
+                    Spacer()
+                    
+                    NavigationLink("ADD") {
+                        Text ("ADD TODO")
                     }
+
+                
                 }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
+                List {
+                    
                 }
             }
-        } detail: {
-            Text("Select an item")
         }
+        .navigationDestination(for: String.self) { _ in
+            TodoEditView()
+        }
+        
+        
     }
 
     private func addItem() {
@@ -49,7 +50,7 @@ struct ContentView: View {
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                modelContext.delete(items[index])
+                modelContext.delete(todos[index])
             }
         }
     }
@@ -62,5 +63,5 @@ struct ContentView: View {
 
 //#Preview {
 //    ContentView()
-//        .modelContainer(for: Item.self, inMemory: true)
+//        .modelContainer(for: TODO.self, inMemory: true)
 //}

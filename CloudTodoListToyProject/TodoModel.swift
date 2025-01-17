@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import SwiftUICore
 
 /*
  Todo 항목 설정
@@ -26,24 +27,41 @@ import SwiftData
  */
 
 @Model
-final class TODO {
+class TODO {
+    enum Priority: String, Codable {
+        case veryHigh = "Very High"
+        case high = "High"
+        case normal = "Normal"
+        case low = "Low"
+        case notImportant = "Not Important"
+        
+        func urgencyColor() -> Color {
+            switch self {
+            case .veryHigh: return .red
+            case .high: return .orange
+            case .normal: return .yellow
+            case .low: return .green
+            case .notImportant: return .blue
+            }
+        }
+    }
     static let defaultTodo = TODO(
         createdDate: Date(),
         dueDate: Date(),
         title: "",
         content: "",
         isFinished: false,
-        priority: 1,
+        priority: Priority.normal,
         category: "none"
     )
     
-    var createdDate: Date
-    var dueDate: Date
-    var title: String
-    var content: String
-    var isFinished: Bool
-    var priority: Int // 1~5
-    var category: String
+    var createdDate: Date = Date()
+    var dueDate: Date = Date()
+    var title: String = "title"
+    var content: String = "title"
+    var isFinished: Bool = false
+    var priority: Priority = Priority.normal
+    var category: String = "none"
     
     init (
         createdDate: Date,
@@ -51,14 +69,13 @@ final class TODO {
         title: String,
         content: String,
         isFinished: Bool,
-        priority: Int,
+        priority: Priority,
         category: String
     ) {
         self.createdDate = createdDate
         self.dueDate = dueDate
         self.title = title
         self.content = content
-        self.title = title
         self.isFinished = isFinished
         self.priority = priority
         self.category = category

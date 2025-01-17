@@ -8,8 +8,12 @@
 import SwiftUI
 
 struct TodoEditView: View {
+    let todoListViewModel: TodoListViewModel
+    @Binding var path: NavigationPath
     typealias Priority = TODO.Priority
-    @State private var newTodo: TODO = TODO.defaultTodo
+    
+    @State var newTodo: TODO // 네이밍 이슈
+    
     private var isEditMode: Bool { // 에딧모드인지에 따라서 뷰를 다르게 호출
         if newTodo == TODO.defaultTodo {
             return false
@@ -41,66 +45,46 @@ struct TodoEditView: View {
      6. 우선순위 -> 드롭다운
      */
     var body: some View {
-        VStack(alignment: .leading) {
-            isEditMode ? Text("Todo Edit View") : Text("Todo Add View")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-            
-            HStack {
-                Text("Title: ")
-                
-                TextField("Enter Title of Todo", text: $newTodo.title)
-            }
-            
-            HStack {
-                
-                Toggle("Is Finished? ", isOn: $newTodo.isFinished)
-                    .padding(.trailing)
-                Menu {
-                    ForEach(priorityOptions, id: \.self) { option in
-                        Button {
-                            newTodo.priority = option
-                        } label: {
-                            Text(option.rawValue)
-                        }
+        Form {
+            Section(header: Text(isEditMode ? "Edit Todo" : "Add Todo").font(.headline)) {
+                TextField("Enter Title", text: $newTodo.title)
 
-                    }
-                } label: {
-                    Text("Urgency: ")
-                        .backgroundStyle(newTodo.priority.urgencyColor())
-                }
-                
-                
-                
+                Toggle("Completed", isOn: $newTodo.isFinished)
+
                 Picker("Priority", selection: $newTodo.priority) {
-                    ForEach(priorityOptions, id: \.self) { priorityOption in
-                        Text(priorityOption.rawValue)
-                        
+                    ForEach(priorityOptions, id: \.self) { option in
+                        Text(option.rawValue).tag(option)
                     }
                 }
-                
-            }
-            
-            
-            HStack {
-                Text("Due Date: ")
-                
-                TextField("Enter Title of Todo", text: $newTodo.title)
-            }
-            
-                Text("Content")
-                
+                .pickerStyle(SegmentedPickerStyle())
+
+                DatePicker("Due Date", selection: $newTodo.dueDate, displayedComponents: .date)
+
                 TextEditor(text: $newTodo.content)
-                .border(.gray)
-                .frame(maxHeight: 150)
-                .padding()
-            
-            
-            
-            
-            
+                    .frame(minHeight: 100, maxHeight: 200) // ✅ 최소 높이 설정
+                    .border(Color.gray, width: 1)
+                    .padding()
+
+
+                HStack {
+                    Spacer()
+                    Button(isEditMode ? "Save Changes" : "Add TODO") {
+                        if isEditMode {
+                           
+                            todoListViewModel.editTodo(newTodo)
+                        } else {
+                            todoListViewModel.todos.append(newTodo)
+                            todoListViewModel.addTodo(newTodo)
+                        }
+                        path.removeLast()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    Spacer()
+                }
+            }
         }
     }
+
 }
 
 //#Preview {

@@ -27,7 +27,7 @@ import SwiftUICore
  */
 
 @Model
-class TODO {
+class TODO: Equatable {
     enum Priority: String, Codable {
         case veryHigh = "Very High"
         case high = "High"

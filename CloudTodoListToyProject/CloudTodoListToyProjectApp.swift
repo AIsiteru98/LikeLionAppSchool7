@@ -10,22 +10,25 @@ import SwiftData
 
 @main
 struct CloudTodoListToyProjectApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            TODO.self,
-        ])
+    private let sharedModelContainer: ModelContainer
+    private let todoListViewModel: TodoListViewModel
+
+    init() {
+        let schema = Schema([TODO.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
 
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            sharedModelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
+            let modelContext = sharedModelContainer.mainContext
+            todoListViewModel = TodoListViewModel(modelContext: modelContext)
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
-    }()
+    }
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(todoListViewModel: todoListViewModel)
         }
         .modelContainer(sharedModelContainer)
     }

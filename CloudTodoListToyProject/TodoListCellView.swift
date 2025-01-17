@@ -8,17 +8,27 @@
 import SwiftUI
 
 struct TodoListCellView: View {
-    var todo: TODO
+    var todo: TODO 
     var body: some View {
         
         HStack {
             
             if todo.isFinished {
                 Image(systemName: "checkmark.square")
+                    .resizable()
+                    .frame(width: 20, height: 20)
                     .foregroundStyle(.green)
+                    .onTapGesture {
+                        todo.isFinished.toggle()
+                    }
             } else {
                 Image(systemName: "checkmark.square.fill")
+                    .resizable()
+                    .frame(width: 20, height: 20)
                     .foregroundStyle(.green)
+                    .onTapGesture {
+                        todo.isFinished.toggle()
+                    }
             }
             VStack(alignment: .leading) {
                 HStack {
@@ -45,7 +55,7 @@ struct TodoListCellView: View {
                 Text(todo.content)
                     .lineLimit(2)
                 
-                Text(todo.dueDate.description)
+                Text(todo.dueDate, style: .date) // ✅ 날짜 스타일 개선
                 
                 
             }
@@ -56,7 +66,7 @@ struct TodoListCellView: View {
         .frame(maxWidth: .infinity, maxHeight: 150)
     }
 }
-
-#Preview {
-    TodoListCellView.init(todo: TODO(createdDate: Date(), dueDate: Date(), title: "축구경기", content: "맨유 vs 리버풀 브루노페르난데스 선발", isFinished: false, priority: .veryHigh, category: "none"))
-}
+//
+//#Preview {
+//    TodoListCellView.init(todo: TODO(createdDate: Date(), dueDate: Date(), title: "축구경기", content: "맨유 vs 리버풀 브루노페르난데스 선발", isFinished: false, priority: .veryHigh, category: "none"))
+//}

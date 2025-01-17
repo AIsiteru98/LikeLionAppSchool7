@@ -8,28 +8,21 @@
 import SwiftUI
 
 struct TodoListCellView: View {
-    var todo: TODO 
+    var todo: TODO
+    let todoListViewModel: TodoListViewModel
+    
     var body: some View {
         
         HStack {
             
-            if todo.isFinished {
-                Image(systemName: "checkmark.square")
-                    .resizable()
-                    .frame(width: 20, height: 20)
-                    .foregroundStyle(.green)
-                    .onTapGesture {
-                        todo.isFinished.toggle()
-                    }
-            } else {
-                Image(systemName: "checkmark.square.fill")
-                    .resizable()
-                    .frame(width: 20, height: 20)
-                    .foregroundStyle(.green)
-                    .onTapGesture {
-                        todo.isFinished.toggle()
-                    }
-            }
+            Image(systemName: todo.isFinished ? "checkmark.square.fill" : "checkmark.square")
+                .resizable()
+                .frame(width: 20, height: 20)
+                .foregroundStyle(.green)
+                .onTapGesture {
+                    todo.isFinished.toggle()
+                    todoListViewModel.editTodo(todo)
+                }
             VStack(alignment: .leading) {
                 HStack {
                     Text(todo.title)

@@ -9,18 +9,20 @@ import SwiftUI
 
 struct TodoEditView: View {
     let todoListViewModel: TodoListViewModel
-    @Binding var path: NavigationPath
+    @Environment(\.dismiss) private var dismiss // 추가
     typealias Priority = TODO.Priority
     
-    @State var newTodo: TODO // 네이밍 이슈
-    
-    private var isEditMode: Bool { // 에딧모드인지에 따라서 뷰를 다르게 호출
-        if newTodo == TODO.defaultTodo {
-            return false
-        } else {
-            return true
-        }
+    @State private var editedTodo: TODO // 편집 중인 임시 상태
+
+    init(todoListViewModel: TodoListViewModel, newTodo: TODO? = nil) {
+        self.todoListViewModel = todoListViewModel
+        self._editedTodo = State(initialValue: newTodo ?? TODO())
     }
+    
+    private var isEditMode: Bool {
+        editedTodo.id != nil
+    }
+
     private let priorityDict: [Priority : Int] = [.veryHigh: 5,
                                                   .high:4,
                                                   .normal: 3,
@@ -47,20 +49,20 @@ struct TodoEditView: View {
     var body: some View {
         Form {
             Section(header: Text(isEditMode ? "Edit Todo" : "Add Todo").font(.headline)) {
-                TextField("Enter Title", text: $newTodo.title)
+                TextField("Enter Title", text: $editedTodo.title)
 
-                Toggle("Completed", isOn: $newTodo.isFinished)
+                Toggle("Completed", isOn: $editedTodo.isFinished)
 
-                Picker("Priority", selection: $newTodo.priority) {
+                Picker("Priority", selection: $editedTodo.priority) {
                     ForEach(priorityOptions, id: \.self) { option in
                         Text(option.rawValue).tag(option)
                     }
                 }
                 .pickerStyle(SegmentedPickerStyle())
 
-                DatePicker("Due Date", selection: $newTodo.dueDate, displayedComponents: .date)
+                DatePicker("Due Date", selection: $editedTodo.dueDate, displayedComponents: .date)
 
-                TextEditor(text: $newTodo.content)
+                TextEditor(text: $editedTodo.content)
                     .frame(minHeight: 100, maxHeight: 200) // ✅ 최소 높이 설정
                     .border(Color.gray, width: 1)
                     .padding()
@@ -70,13 +72,11 @@ struct TodoEditView: View {
                     Spacer()
                     Button(isEditMode ? "Save Changes" : "Add TODO") {
                         if isEditMode {
-                           
-                            todoListViewModel.editTodo(newTodo)
+                            todoListViewModel.editTodo(editedTodo)
                         } else {
-                            todoListViewModel.todos.append(newTodo)
-                            todoListViewModel.addTodo(newTodo)
+                            todoListViewModel.addTodo(editedTodo)
                         }
-                        path.removeLast()
+                        dismiss()
                     }
                     .buttonStyle(.borderedProminent)
                     Spacer()

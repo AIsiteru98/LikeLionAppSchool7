@@ -27,7 +27,7 @@ import SwiftUICore
  */
 
 @Model
-class TODO: Equatable {
+class TODO: Equatable, Identifiable, Hashable {
     enum Priority: String, Codable {
         case veryHigh = "Very High"
         case high = "High"
@@ -45,16 +45,8 @@ class TODO: Equatable {
             }
         }
     }
-    static let defaultTodo = TODO(
-        createdDate: Date(),
-        dueDate: Date(),
-        title: "",
-        content: "",
-        isFinished: false,
-        priority: Priority.normal,
-        category: "none"
-    )
     
+    var id: UUID? = nil
     var createdDate: Date = Date()
     var dueDate: Date = Date()
     var title: String = "title"
@@ -63,6 +55,8 @@ class TODO: Equatable {
     var priority: Priority = Priority.normal
     var category: String = "none"
     
+    init() {}
+        
     init (
         createdDate: Date,
         dueDate: Date,

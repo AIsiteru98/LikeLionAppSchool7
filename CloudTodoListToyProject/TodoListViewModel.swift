@@ -33,34 +33,32 @@ class TodoListViewModel {
     ///
     /// fetchTodos 필요없음 insertrk
     func addTodo(_ todo: TODO) {
+        todo.id = UUID()
         modelContext.insert(todo)
-       // fetchTodos() // 변경된 데이터 반영
+        saveTodo()
+        fetchTodos()
     }
     
-    /// 기존에 존재하는 TODO 변경
-       func editTodo(_ todo: TODO) {
-           if let index = todos.firstIndex(where: { $0.id == todo.id }) {
-               todos[index] = todo
-               saveTodo() // 변경사항 저장
-           } else {
-               print("Error: Cannot find TODO to edit")
-           }
-       }
+    func editTodo(_ todo: TODO) {
+        // SwiftData는 참조 타입이므로 자동으로 변경사항이 추적됨
+        saveTodo()
+        fetchTodos() // UI 업데이트를 위해 필요
+    }
     
-    /// TODO 삭제
     func deleteTodo(at offsets: IndexSet) {
         for index in offsets {
             modelContext.delete(todos[index])
         }
-       // saveTodo()
+        saveTodo()
+        fetchTodos() // UI 업데이트를 위해 필요
     }
-    /// TODO 저장
+    
     func saveTodo() {
-            do {
-                try modelContext.save() // SwiftData에 저장
-                fetchTodos() // ✅ 변경된 데이터 반영
-            } catch {
-                print("Failed to save TODOs: \(error)")
-            }
+        do {
+            try modelContext.save() // SwiftData에 저장
+            fetchTodos() // ✅ 변경된 데이터 반영
+        } catch {
+            print("Failed to save TODOs: \(error)")
         }
+    }
 }
